@@ -8,6 +8,6 @@ const readFileTalker = async () => {
   } catch (error) {
     console.error(error.message);
   }
-}
+};
 
 module.exports = readFileTalker;

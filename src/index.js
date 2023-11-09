@@ -15,9 +15,8 @@ app.get('/', (_request, response) => {
 
 app.get('/talker', async (req, res) => {
   try {
-    const data = await readFileTalker();
-    console.log(data);
-    return res.status(HTTP_OK_STATUS).json(data);
+    const talkers = await readFileTalker();
+    return res.status(HTTP_OK_STATUS).json(talkers);
   } catch (error) {
     return res.status(HTTP_OK_STATUS).json([]);
   }
@@ -26,13 +25,14 @@ app.get('/talker', async (req, res) => {
 app.get('/talker/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const data = readFileTalker();
-    const talkers = JSON.parse(data);
-    const talker = talkers.find((talker) => talker.id === Number(id));
-    console.log(talker);
-    return res.status(HTTP_OK_STATUS).json(talker);
+    const talkers = await readFileTalker();
+    const talkerId = talkers.find((talker) => talker.id === Number(id));
+    if (talkerId) {
+      return res.status(HTTP_OK_STATUS).json(talkerId);
+    } 
+    return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
   } catch (error) {
-    res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+    return res.status(500).json({ message: 'Erro interno' });
   }
 });
 
