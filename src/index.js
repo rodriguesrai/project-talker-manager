@@ -2,8 +2,9 @@ const express = require('express');
 
 const app = express();
 app.use(express.json());
-const readFileTalker = require('./fsReadFile');
+const readFileTalker = require('./utils/fsReadFile');
 const generateToken = require('./utils/tokenGenerator');
+const authenticate = require('./middlewares/authenticate');
 
 const HTTP_OK_STATUS = 200;
 
@@ -41,11 +42,8 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-app.post('/login', (req, res) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
-    return res.status(400).json({ message: "O campo \"email\" é obrigatório" });
-  }
+app.post('/login', authenticate, (req, res) => {
+
   const token = generateToken();
   return res.status(200).json({ token });
 });
