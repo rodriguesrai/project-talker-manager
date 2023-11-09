@@ -3,10 +3,15 @@ const express = require('express');
 const app = express();
 app.use(express.json());
 const readFileTalker = require('./fsReadFile');
+const generateToken = require('./utils/tokenGenerator');
 
 const HTTP_OK_STATUS = 200;
 
 const PORT = process.env.PORT || '3001';
+
+app.listen(PORT, () => {
+  console.log('Online');
+});
 
 // não remova esse endpoint, e para o avaliador funcionar
 app.get('/', (_request, response) => {
@@ -36,6 +41,11 @@ app.get('/talker/:id', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log('Online');
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+  if (!email || !password) {
+    return res.status(400).json({ message: "O campo \"email\" é obrigatório" });
+  }
+  const token = generateToken();
+  return res.status(200).json({ token });
 });
