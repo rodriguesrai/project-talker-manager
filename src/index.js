@@ -43,7 +43,6 @@ app.get('/talker/:id', async (req, res) => {
 });
 
 app.post('/login', authenticate, (req, res) => {
-
   const token = generateToken();
   return res.status(200).json({ token });
 });
