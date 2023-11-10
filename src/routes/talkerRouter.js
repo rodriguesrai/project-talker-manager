@@ -85,4 +85,16 @@ talkerRouter.put('/:id',
     }
   });
 
+talkerRouter.delete('/:id', authorization, talkerIdCheck, async (req, res) => {
+  try {
+    const talkers = await readFileTalker();
+    const { talkerIndex } = req;
+  
+    talkers.splice(talkerIndex, 1);
+    await writeFileTalker(talkers);
+    return res.status(204).json({ message: 'Pessoa palestrante deletada com sucesso' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro interno' });
+  }
+});
 module.exports = talkerRouter;
