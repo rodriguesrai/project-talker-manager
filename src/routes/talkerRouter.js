@@ -15,7 +15,6 @@ const {
   checkRateQueryExistent,
   checkTalkExistence,
   checkWatchedAt,
-  checkRateQuery,
 } = require('../middlewares/talkCheck');
 const authorization = require('../middlewares/tokenCheck');
 const talkerIdCheck = require('../middlewares/talkerIdCheck');
@@ -38,12 +37,13 @@ talkerRouter.get('/search',
       if (q) {
         filteredTalkers = talkers.filter((talker) => talker.name.includes(q));
       }
-      if (rate) {
-        filteredTalkers = filteredTalkers.filter((talker) => talker.rate === Number(rate));
+      if (rate) {  
+        const numericRate = Number(rate);
+        filteredTalkers = filteredTalkers.filter((talker) => talker.talk.rate === numericRate);
       }
       return res.status(HTTP_OK_STATUS).json(filteredTalkers);
     } catch (error) {
-      return res.status(HTTP_OK_STATUS).json([]);
+      return res.status(500).json({ message: 'Erro interno do servidor' });
     }
   });
 

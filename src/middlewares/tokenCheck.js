@@ -7,10 +7,11 @@ const authorization = (req, res, next) => {
     if (authorizationHeaders.length !== 16) {
       return res.status(401).json({ message: 'Token inválido' });
     }
+    next();
   } catch (error) {
     return res.status(401).json({ message: 'Erro ao conferir token' });
   }
-  next();
+  
 };
 
 module.exports = authorization;

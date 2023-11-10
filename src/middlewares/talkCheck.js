@@ -39,27 +39,20 @@ const checkRateBody = (req, res, next) => {
 
 const checkRateQueryExistent = (req, res, next) => {
   const { rate } = req.query;
-  const rateNumber = parseFloat(rate);
-  if (
-    (rate !== undefined && !Number.isInteger(rateNumber))
-   || rateNumber < 1
-   || rateNumber > 5
-  ) {
-    res
-      .status(400)
-      .json({
+
+  if (rate !== undefined) {
+    const ratePattern = /^[1-5]$/;
+
+    if (!ratePattern.test(rate)) {
+      return res.status(400).json({
         message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
       });
-  }
-  next();
-};
+    }
 
-const checkRateQuery = (req, res, next) => {
-  const { rate } = req.query;
-  if (rate === undefined) {
-    next();
+    return next();
   }
-  
+
+  next();
 };
 
 module.exports = {
@@ -68,5 +61,4 @@ module.exports = {
   checkRateExistentBody,
   checkRateBody,
   checkRateQueryExistent,
-  checkRateQuery,
 };
