@@ -22,6 +22,17 @@ talkerRouter.get('/', async (req, res) => {
   }
 });
 
+talkerRouter.get('/search', authorization, async (req, res) => {
+  try {
+    const { q } = req.query;
+    const talkers = await readFileTalker();
+    const talkersSearch = talkers.filter((talker) => talker.name.includes(q));
+    return res.status(HTTP_OK_STATUS).json(talkersSearch);
+  } catch (error) {
+    return res.status(HTTP_OK_STATUS).json([]);
+  }
+});
+
 talkerRouter.get('/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -97,4 +108,6 @@ talkerRouter.delete('/:id', authorization, talkerIdCheck, async (req, res) => {
     return res.status(500).json({ message: 'Erro interno' });
   }
 });
+
+
 module.exports = talkerRouter;
