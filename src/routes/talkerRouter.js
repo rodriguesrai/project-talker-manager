@@ -109,5 +109,4 @@ talkerRouter.delete('/:id', authorization, talkerIdCheck, async (req, res) => {
   }
 });
 
-
 module.exports = talkerRouter;
