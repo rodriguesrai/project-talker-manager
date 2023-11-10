@@ -6,10 +6,12 @@ const HTTP_OK_STATUS = 200;
 const readFileTalker = require('../utils/fsReadFile');
 const writeFileTalker = require('../utils/fsWriteFile');
 
-const nameCheck = require('../middlewares/nameCheck');
+const { nameExistenceCheck, nameLengthcheck } = require('../middlewares/nameCheck');
 const tokenCheck = require('../middlewares/tokenCheck');
 const ageCheck = require('../middlewares/ageCheck');
 const talkCheck = require('../middlewares/talkCheck');
+const authorization = require('../middlewares/tokenCheck');
+const talkerIdCheck = require('../middlewares/talkerIdCheck');
 
 talkerRouter.get('/', async (req, res) => {
   try {
@@ -36,7 +38,8 @@ talkerRouter.get('/:id', async (req, res) => {
 
 talkerRouter.post('/', 
   tokenCheck, 
-  nameCheck,
+  nameExistenceCheck,
+  nameLengthcheck,
   ageCheck,
   talkCheck, async (req, res) => {
     try {
@@ -51,6 +54,32 @@ talkerRouter.post('/',
       talkers.push(newTalker);
       await writeFileTalker(talkers);
       return res.status(201).json(newTalker);
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro interno' });
+    }
+  });
+
+talkerRouter.put('/:id',
+  authorization,
+  talkerIdCheck,
+  nameExistenceCheck,
+  nameLengthcheck,
+  ageCheck,
+  talkCheck, async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, age, talk } = req.body;
+      const talkers = await readFileTalker();
+      const { talkerIndex } = req;
+      const newTalker = {
+        id: Number(id),
+        name,
+        age,
+        talk,
+      };
+      talkers[talkerIndex] = newTalker;
+      await writeFileTalker(talkers);
+      return res.status(200).json(newTalker);
     } catch (error) {
       return res.status(500).json({ message: 'Erro interno' });
     }
