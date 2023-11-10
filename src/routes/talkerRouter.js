@@ -14,7 +14,6 @@ const talkCheck = require('../middlewares/talkCheck');
 talkerRouter.get('/', async (req, res) => {
   try {
     const talkers = await readFileTalker();
-    console.log('Dados lidos', talkers);
     return res.status(HTTP_OK_STATUS).json(talkers);
   } catch (error) {
     return res.status(HTTP_OK_STATUS).json([]);

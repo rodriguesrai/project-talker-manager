@@ -1,5 +1,5 @@
 const express = require('express');
-const talkerRouter = require('./routes/talkers');
+const router = require('./routes');
 
 const app = express();
 app.use(express.json());
@@ -25,4 +25,4 @@ app.post('/login', authenticate, (req, res) => {
   return res.status(200).json({ token });
 });
 
-app.use('/talker', talkerRouter);
+app.use('/talker', router.talkerRouter);
