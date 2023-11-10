@@ -15,6 +15,7 @@ const {
   checkRateQueryExistent,
   checkTalkExistence,
   checkWatchedAt,
+  checkWatchedAtQuery,
 } = require('../middlewares/talkCheck');
 const authorization = require('../middlewares/tokenCheck');
 const talkerIdCheck = require('../middlewares/talkerIdCheck');
@@ -29,9 +30,10 @@ talkerRouter.get('/', async (req, res) => {
 });
 
 talkerRouter.get('/search',
-  authorization, checkRateQueryExistent, async (req, res) => {
+  // eslint-disable-next-line complexity
+  authorization, checkRateQueryExistent, checkWatchedAtQuery, async (req, res) => {
     try {
-      const { q, rate } = req.query;
+      const { q, rate, date } = req.query;
       const talkers = await readFileTalker();
       let filteredTalkers = talkers;
       if (q) {
@@ -40,6 +42,9 @@ talkerRouter.get('/search',
       if (rate) {  
         const numericRate = Number(rate);
         filteredTalkers = filteredTalkers.filter((talker) => talker.talk.rate === numericRate);
+      }
+      if (date !== undefined && date !== null && date !== '') {
+        filteredTalkers = filteredTalkers.filter((talker) => talker.talk.watchedAt === date);
       }
       return res.status(HTTP_OK_STATUS).json(filteredTalkers);
     } catch (error) {

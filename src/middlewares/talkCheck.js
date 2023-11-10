@@ -1,3 +1,5 @@
+const readFileTalker = require('../utils/fsReadFile');
+
 const checkTalkExistence = (req, res, next) => {
   const { talk } = req.body;
   if (!talk) {
@@ -15,6 +17,24 @@ const checkWatchedAt = (req, res, next) => {
   }
   if (!dateRegex.test(watchedAt)) {
     return res.status(400).json({ message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"' });
+  }
+  next();
+};
+
+const checkWatchedAtQuery = async (req, res, next) => {
+  const { date } = req.query;
+  const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+  try {
+    const talkers = await readFileTalker();
+    if (!date) {
+      return res.status(200).json(talkers);
+    }
+    if (!dateRegex.test(date)) {
+      return res.status(400)
+        .json({ message: 'O parâmetro "date" deve ter o formato "dd/mm/aaaa"' });
+    } 
+  } catch (error) {
+    return res.status(500).json({ message: 'Erro interno do servidor' });
   }
   next();
 };
@@ -61,4 +81,5 @@ module.exports = {
   checkRateExistentBody,
   checkRateBody,
   checkRateQueryExistent,
+  checkWatchedAtQuery,
 };
