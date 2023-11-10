@@ -9,7 +9,14 @@ const writeFileTalker = require('../utils/fsWriteFile');
 const { nameExistenceCheck, nameLengthcheck } = require('../middlewares/nameCheck');
 const tokenCheck = require('../middlewares/tokenCheck');
 const ageCheck = require('../middlewares/ageCheck');
-const talkCheck = require('../middlewares/talkCheck');
+const {
+  checkRateBody,
+  checkRateExistentBody,
+  checkRateQueryExistent,
+  checkTalkExistence,
+  checkWatchedAt,
+  checkRateQuery,
+} = require('../middlewares/talkCheck');
 const authorization = require('../middlewares/tokenCheck');
 const talkerIdCheck = require('../middlewares/talkerIdCheck');
 
@@ -22,16 +29,23 @@ talkerRouter.get('/', async (req, res) => {
   }
 });
 
-talkerRouter.get('/search', authorization, async (req, res) => {
-  try {
-    const { q } = req.query;
-    const talkers = await readFileTalker();
-    const talkersSearch = talkers.filter((talker) => talker.name.includes(q));
-    return res.status(HTTP_OK_STATUS).json(talkersSearch);
-  } catch (error) {
-    return res.status(HTTP_OK_STATUS).json([]);
-  }
-});
+talkerRouter.get('/search',
+  authorization, checkRateQueryExistent, async (req, res) => {
+    try {
+      const { q, rate } = req.query;
+      const talkers = await readFileTalker();
+      let filteredTalkers = talkers;
+      if (q) {
+        filteredTalkers = talkers.filter((talker) => talker.name.includes(q));
+      }
+      if (rate) {
+        filteredTalkers = filteredTalkers.filter((talker) => talker.rate === Number(rate));
+      }
+      return res.status(HTTP_OK_STATUS).json(filteredTalkers);
+    } catch (error) {
+      return res.status(HTTP_OK_STATUS).json([]);
+    }
+  });
 
 talkerRouter.get('/:id', async (req, res) => {
   try {
@@ -52,7 +66,10 @@ talkerRouter.post('/',
   nameExistenceCheck,
   nameLengthcheck,
   ageCheck,
-  talkCheck, async (req, res) => {
+  checkTalkExistence,
+  checkWatchedAt,
+  checkRateExistentBody,
+  checkRateBody, async (req, res) => {
     try {
       const { name, age, talk } = req.body;
       const talkers = await readFileTalker();
@@ -76,7 +93,10 @@ talkerRouter.put('/:id',
   nameExistenceCheck,
   nameLengthcheck,
   ageCheck,
-  talkCheck, async (req, res) => {
+  checkTalkExistence,
+  checkWatchedAt,
+  checkRateExistentBody,
+  checkRateBody, async (req, res) => {
     try {
       const { id } = req.params;
       const { name, age, talk } = req.body;

@@ -1,12 +1,12 @@
-const checkTalkExistence = (req, res) => {
+const checkTalkExistence = (req, res, next) => {
   const { talk } = req.body;
   if (!talk) {
     return res.status(400).json({ message: 'O campo "talk" é obrigatório' });
   }
-  return true;
+  next();
 };
 
-const checkWatchedAt = (req, res) => {
+const checkWatchedAt = (req, res, next) => {
   const { talk } = req.body;
   const { watchedAt } = talk;
   const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
@@ -16,34 +16,57 @@ const checkWatchedAt = (req, res) => {
   if (!dateRegex.test(watchedAt)) {
     return res.status(400).json({ message: 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"' });
   }
-  return true;
+  next();
 };
 
-const checkRateExistent = (req, res) => {
+const checkRateExistentBody = (req, res, next) => {
   const { talk } = req.body;
-  const { rate } = talk;
-  if (rate === undefined || rate === null) {
+  if (talk.rate === undefined || talk.rate === null) {
     return res.status(400).json({ message: 'O campo "rate" é obrigatório' });
   }
-  return true;
+  next();
 };
-const checkRate = (req, res) => {
+
+const checkRateBody = (req, res, next) => {
   const { talk } = req.body;
   const { rate } = talk;
   if (rate < 1 || rate > 5 || !Number.isInteger(rate)) {
     return res.status(400)
       .json({ message: 'O campo "rate" deve ser um número inteiro entre 1 e 5' });
   }
-  return true;
+  next();
 };  
 
-const talkCheck = (req, res, next) => {
-  const checks = [checkTalkExistence, checkRateExistent, checkWatchedAt, checkRate];
-  const results = checks.map((check) => check(req, res));
-
-  if (results.every((result) => result === true)) {
-    next();
+const checkRateQueryExistent = (req, res, next) => {
+  const { rate } = req.query;
+  const rateNumber = parseFloat(rate);
+  if (
+    (rate !== undefined && !Number.isInteger(rateNumber))
+   || rateNumber < 1
+   || rateNumber > 5
+  ) {
+    res
+      .status(400)
+      .json({
+        message: 'O campo "rate" deve ser um número inteiro entre 1 e 5',
+      });
   }
+  next();
 };
 
-module.exports = talkCheck;
+const checkRateQuery = (req, res, next) => {
+  const { rate } = req.query;
+  if (rate === undefined) {
+    next();
+  }
+  
+};
+
+module.exports = {
+  checkTalkExistence,
+  checkWatchedAt,
+  checkRateExistentBody,
+  checkRateBody,
+  checkRateQueryExistent,
+  checkRateQuery,
+};
