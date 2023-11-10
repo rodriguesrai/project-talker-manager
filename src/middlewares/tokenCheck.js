@@ -11,7 +11,6 @@ const authorization = (req, res, next) => {
   } catch (error) {
     return res.status(401).json({ message: 'Erro ao conferir token' });
   }
-  
 };
 
 module.exports = authorization;
